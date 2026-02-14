@@ -11,6 +11,12 @@
 5. [Libraries and Function Calls Explained](#5-libraries-and-function-calls-explained)
 6. [Detailed Code Walkthrough — All Files](#6-detailed-code-walkthrough--all-files)
 7. [Code Flow Chart](#7-code-flow-chart)
+8. [Deep Dive Q&A — Key Concepts Explained](#8-deep-dive-qa--key-concepts-explained)
+   - [8.1 `invoke()` vs `run()` — What's the difference?](#81-invoke-vs-run--whats-the-difference)
+   - [8.2 Why are there two `PipelineState` definitions?](#82-why-are-there-two-pipelinestate-definitions)
+   - [8.3 What are reducers and why do we need them?](#83-what-are-reducers-and-why-do-we-need-them)
+   - [8.4 Why don't `raw_logs` and `file_name` need reducers?](#84-why-dont-raw_logs-and-file_name-need-reducers)
+   - [8.5 How does the shared state get created, updated, and merged?](#85-how-does-the-shared-state-get-created-updated-and-merged)
 
 ---
 
@@ -1638,6 +1644,467 @@ LangGraph_Project/
     ├── tasks-devops-incident-analysis-suite.md      # Implementation task list
     └── vibe-check-devops-incident-analysis-suite.md # Code quality review
 ```
+
+---
+
+## 8. Deep Dive Q&A — Key Concepts Explained
+
+These are commonly asked questions about the inner workings of this project. Each one is answered with analogies and diagrams to make the concepts stick.
+
+---
+
+### 8.1 `invoke()` vs `run()` — What's the difference?
+
+These look similar but are fundamentally different things:
+
+#### `invoke()` — A LangChain/LangGraph method
+
+`invoke` is part of the **LangChain Runnable interface**. Any LangChain object that is "runnable" (LLMs, compiled graphs, chains) has this method. It means "execute this thing synchronously and return the result."
+
+It's used in two places in the project:
+
+**1. Running the compiled graph** (`graph.py` line 163):
+```python
+compiled = build_graph()
+result = compiled.invoke(initial_state)  # runs the entire pipeline
+```
+
+**2. Calling the LLM** (e.g., `log_classifier.py` line 137):
+```python
+response = llm.invoke([
+    SystemMessage(content=SYSTEM_PROMPT),
+    HumanMessage(content="Parse these log lines..."),
+])
+```
+
+#### `run()` — Just a custom Python function
+
+`run()` in this project is **not** a LangGraph method at all. It's a plain function the developer defined in each agent module as a naming convention. It could have been named `execute()` or `process()` — the name doesn't matter to LangGraph.
+
+```python
+# This is just a regular function, nothing special to LangGraph
+def run(state: dict, llm) -> dict:
+    ...
+    return {"log_entries": [...]}
+```
+
+LangGraph only cares about the **node wrapper functions** registered in the graph:
+
+```python
+graph.add_node("log_classifier", log_classifier_node)  # ← this is what LangGraph knows about
+```
+
+#### Summary Table
+
+| Method | Belongs to | Purpose |
+|--------|-----------|---------|
+| `invoke()` | LangChain Runnable interface | Execute a compiled graph or LLM call synchronously |
+| `run()` | Custom code (developer-defined) | Just a naming convention for agent logic — LangGraph doesn't know or care about it |
+
+The Runnable interface also has `ainvoke` (async), `stream` (get results token-by-token), and `batch` (run multiple inputs). In this project, only `invoke` is used since everything runs synchronously.
+
+---
+
+### 8.2 Why are there two `PipelineState` definitions?
+
+`PipelineState` is defined **twice** in this codebase, and understanding why is important:
+
+#### The one that actually runs — `graph.py` (lines 30–39)
+
+```python
+class PipelineState(TypedDict):
+    raw_logs: str
+    file_name: str
+    log_entries: Annotated[list, _merge_lists]
+    issues: Annotated[list, _merge_lists]
+    cookbook: Annotated[str, _last_value]
+    jira_tickets: Annotated[list, _merge_lists]
+    notification: Annotated[Any, _last_value]
+    current_agent: Annotated[str, _last_value]
+    error: Annotated[str, _last_value]
+```
+
+This is the **authoritative** version. It's a `TypedDict` (a dictionary with fixed keys) that LangGraph uses as the shared state. The `Annotated` hints attach **reducer functions** that tell LangGraph how to merge results when parallel agents update the same field simultaneously.
+
+LangGraph **requires** `TypedDict` for this reducer annotation pattern to work.
+
+#### The one that's just documentation — `schemas.py` (lines 87–98)
+
+```python
+class PipelineState(BaseModel):
+    raw_logs: str = ""
+    log_entries: list[LogEntry] = Field(default_factory=list)
+    issues: list[Issue] = Field(default_factory=list)
+    ...
+```
+
+This is a **Pydantic `BaseModel`** version. It's not actually used at runtime — it serves as a readable reference for what the pipeline state looks like. The vibe-check document even flagged this as slightly redundant.
+
+#### Comparison
+
+| | `graph.py` (TypedDict) | `schemas.py` (BaseModel) |
+|---|---|---|
+| **Used at runtime** | Yes | No |
+| **Has reducers** | Yes (`_merge_lists`, `_last_value`) | No |
+| **LangGraph compatible** | Yes | No — LangGraph needs TypedDict |
+| **Purpose** | Actual pipeline state | Documentation / data contract reference |
+
+---
+
+### 8.3 What are reducers and why do we need them?
+
+#### The Problem
+
+After the remediation agent finishes, three agents run **at the same time** (parallel fan-out):
+
+```
+remediation ──→ cookbook       (writes: cookbook, current_agent)
+           ──→ jira_ticket   (writes: jira_tickets, current_agent)
+           ──→ notification  (writes: notification, current_agent)
+```
+
+All three finish independently and each returns a partial state dict back to LangGraph. LangGraph now has **3 updates to the same state**. How does it combine them? That's what reducers answer.
+
+#### `_merge_lists` — For list fields
+
+```python
+def _merge_lists(a: list, b: list) -> list:
+    return (a or []) + (b or [])
+```
+
+Used on: `log_entries`, `issues`, `jira_tickets`
+
+If two agents both returned `jira_tickets`, all tickets get combined into one list (not one overwriting the other).
+
+#### `_last_value` — For single-value fields
+
+```python
+def _last_value(a, b):
+    return b if b else a
+```
+
+Used on: `cookbook`, `notification`, `current_agent`, `error`
+
+The latest non-empty value wins. For `current_agent`, all 3 parallel agents write this — whichever finishes last wins.
+
+#### "But no two agents write to the same field — so why bother?"
+
+Great observation! In this project, each parallel agent writes to its own unique field:
+
+- cookbook agent → `cookbook`
+- jira_ticket agent → `jira_tickets`
+- notification agent → `notification`
+
+There's no actual collision. **But LangGraph doesn't know that.** It just sees 3 parallel nodes finishing and needs a merge rule for EVERY field in the state, or it crashes.
+
+#### The Pizza Kitchen Analogy
+
+Imagine a pizza kitchen where 3 chefs work at the same counter simultaneously:
+
+```
+┌──────────────────────────────────────────────────────┐
+│                  SHARED COUNTER                       │
+│                                                      │
+│  🍕 Pizza Tray    🥗 Salad Bowl    🥤 Drinks Tray    │
+│                                                      │
+└──────────────────────────────────────────────────────┘
+        ▲                ▲                 ▲
+        │                │                 │
+   Chef Marco       Chef Priya        Chef Alex
+   (makes pizza)    (makes salad)     (pours drinks)
+```
+
+Each chef ONLY touches their own area:
+- Marco only puts pizzas on the Pizza Tray
+- Priya only puts salad in the Salad Bowl
+- Alex only puts drinks on the Drinks Tray
+
+**No conflict, right?** Correct. But the kitchen manager (LangGraph) has a strict rule:
+
+> "I don't care WHO puts WHAT WHERE. All I know is that 3 people are working at the same counter at the same time. I NEED a rule for EVERY item on that counter, or I refuse to open the kitchen."
+
+The manager doesn't analyze which chef touches which tray. The manager just sees:
+
+```
+3 parallel workers + 1 shared counter = I NEED MERGE RULES FOR EVERYTHING
+```
+
+So you declare rules (reducers), even for trays that only one chef uses.
+
+The reducers are like seatbelts — you need them even for short drives where nothing goes wrong, because the car (LangGraph) won't start without them.
+
+#### When WOULD `_merge_lists` actually combine things?
+
+If in a future v2 you added a **second JIRA agent** — one for security tickets, one for infrastructure tickets:
+
+```
+remediation ──→ jira_security_agent   → writes jira_tickets: [sec_ticket_1]
+           ──→ jira_infra_agent       → writes jira_tickets: [infra_ticket_1, infra_ticket_2]
+```
+
+NOW two agents write to the same `jira_tickets` list. The `_merge_lists` reducer combines them:
+
+```
+[sec_ticket_1] + [infra_ticket_1, infra_ticket_2] = [sec_ticket_1, infra_ticket_1, infra_ticket_2]
+```
+
+Without the reducer, one would overwrite the other and you'd lose tickets.
+
+---
+
+### 8.4 Why don't `raw_logs` and `file_name` need reducers?
+
+Because **no agent ever writes to them**. Look at what every agent returns:
+
+```python
+# log_classifier returns:
+{"log_entries": [...], "current_agent": "log_classifier"}
+
+# remediation returns:
+{"issues": [...], "current_agent": "remediation"}
+
+# cookbook returns:
+{"cookbook": "...", "current_agent": "cookbook"}
+
+# jira_ticket returns:
+{"jira_tickets": [...], "current_agent": "jira_ticket"}
+
+# notification returns:
+{"notification": {...}, "current_agent": "notification"}
+```
+
+Not a single agent returns `raw_logs` or `file_name`. They only **read** those values:
+
+```python
+# log_classifier.py line 124 — reads raw_logs, never writes it back
+raw_logs: str = state["raw_logs"]
+```
+
+Back to the pizza kitchen: the **Order Slip** (`raw_logs`, `file_name`) is placed on the counter at the start by the customer. Every chef reads it to know what to make, but **nobody writes on it or replaces it**. It just sits there untouched.
+
+LangGraph only needs merge rules for things that **could be written to** during parallel execution. The order slip is read-only, so no rule needed.
+
+```python
+class PipelineState(TypedDict):
+    raw_logs: str                              # ← read-only input, no reducer needed
+    file_name: str                             # ← read-only input, no reducer needed
+    log_entries: Annotated[list, _merge_lists]  # ← agents write here, needs reducer
+    issues: Annotated[list, _merge_lists]       # ← agents write here, needs reducer
+    cookbook: Annotated[str, _last_value]        # ← agents write here, needs reducer
+    ...
+```
+
+---
+
+### 8.5 How does the shared state get created, updated, and merged?
+
+Let's trace the entire lifecycle of the state object through `graph.py`.
+
+#### Step 1: State is Born (`graph.py` lines 151–161)
+
+```python
+initial_state = {
+    "raw_logs": raw_logs,          # "2026-02-13 ERROR [auth] Login failed..."
+    "file_name": file_name,         # "microservices_mixed.log"
+    "log_entries": [],              # empty — Agent 1 will fill this
+    "issues": [],                   # empty — Agent 2 will fill this
+    "cookbook": "",                  # empty — Agent 3 will fill this
+    "jira_tickets": [],             # empty — Agent 4 will fill this
+    "notification": None,           # empty — Agent 5 will fill this
+    "current_agent": "",
+    "error": "",
+}
+```
+
+This is just a plain Python dictionary. Nothing special yet. It's handed to LangGraph:
+
+```python
+result = compiled.invoke(initial_state)  # line 163
+```
+
+At this moment, LangGraph takes ownership of this dict. From now on, **LangGraph controls who sees what and when**.
+
+#### Step 2: Agent 1 Reads and Writes — Log Classifier
+
+LangGraph passes the **full state** to the first node. Inside `log_classifier.run()`, the agent **reads** from state:
+
+```python
+raw_logs: str = state["raw_logs"]  # reads the raw log text
+```
+
+Then it **returns only what it changed** (NOT the full state):
+
+```python
+return {"log_entries": [e.model_dump() for e in entries], "current_agent": "log_classifier"}
+```
+
+LangGraph receives this partial dict and **merges it into the full state**:
+
+```
+BEFORE merge:                          RETURNED by agent:
+┌─────────────────────────────┐       ┌──────────────────────────────────┐
+│ raw_logs: "2026-02..."      │       │ log_entries: [{line_number: 1,   │
+│ file_name: "micro..."       │       │   level: "ERROR", ...}, ...]     │
+│ log_entries: []        ◄────┼───────│ current_agent: "log_classifier"  │
+│ issues: []                  │       └──────────────────────────────────┘
+│ cookbook: ""                 │
+│ jira_tickets: []            │
+│ notification: None          │
+│ current_agent: ""      ◄────┼───── updated
+│ error: ""                   │
+└─────────────────────────────┘
+
+AFTER merge:
+┌─────────────────────────────────┐
+│ log_entries: [{...}, {...}, ...] │ ✅ updated
+│ current_agent: "log_classifier"  │ ✅ updated
+│ everything else: unchanged       │
+└─────────────────────────────────┘
+```
+
+**Key insight**: Agents return **only the fields they changed**. LangGraph merges them into the existing state. Unchanged fields carry forward automatically.
+
+#### Step 3: Agent 2 Reads Agent 1's Output — Remediation
+
+LangGraph passes the **updated state** (now containing `log_entries`) to the next node. Inside `remediation.run()`, the agent **reads what Agent 1 wrote**:
+
+```python
+log_entries = state.get("log_entries", [])  # reads the entries Agent 1 produced
+```
+
+Then returns its own partial update:
+
+```python
+return {"issues": [...], "current_agent": "remediation"}
+```
+
+```
+State after Agent 2 merge:
+┌───────────────────────────────────────────┐
+│ raw_logs: "2026-02..."                    │  (original)
+│ file_name: "micro..."                     │  (original)
+│ log_entries: [{...}, {...}, ...]           │  (from Agent 1)
+│ issues: [{severity: "CRITICAL", ...}, ...]│  ✅ NEW from Agent 2
+│ cookbook: ""                               │  (still empty)
+│ jira_tickets: []                          │  (still empty)
+│ notification: None                        │  (still empty)
+│ current_agent: "remediation"              │  ✅ updated
+└───────────────────────────────────────────┘
+```
+
+#### Step 4: The Parallel Fan-Out — Where Reducers Matter
+
+LangGraph sends **a copy of the same state** to 3 agents simultaneously:
+
+```
+                    ┌─────────────────────────────────────┐
+                    │        STATE (after Agent 2)         │
+                    │  raw_logs, log_entries, issues, ...  │
+                    └──────────┬──────────┬──────────┬─────┘
+                               │          │          │
+            ┌──────────────────┘          │          └──────────────────┐
+            ▼                             ▼                            ▼
+     Agent 3 (cookbook)          Agent 4 (jira_ticket)        Agent 5 (notification)
+     reads: issues              reads: issues                reads: issues, cookbook
+     returns:                   returns:                     returns:
+     {                          {                            {
+       "cookbook": "# Run...",     "jira_tickets": [...],       "notification": {...},
+       "current_agent":           "current_agent":             "current_agent":
+         "cookbook"                  "jira_ticket"                "notification"
+     }                          }                            }
+```
+
+Now LangGraph has **3 partial updates**. It applies the reducers:
+
+```
+Field: cookbook
+  Current: ""
+  Agent 3 returns: "# Remediation Cookbook..."
+  Agent 4 returns: (nothing for this field)
+  Agent 5 returns: (nothing for this field)
+  Reducer _last_value → "# Remediation Cookbook..."  ✅
+
+Field: jira_tickets
+  Current: []
+  Agent 3 returns: (nothing for this field)
+  Agent 4 returns: [ticket1, ticket2]
+  Agent 5 returns: (nothing for this field)
+  Reducer _merge_lists: [] + [ticket1, ticket2] → [ticket1, ticket2]  ✅
+
+Field: notification
+  Current: None
+  Agent 3 returns: (nothing for this field)
+  Agent 4 returns: (nothing for this field)
+  Agent 5 returns: {summary: "...", sent: true}
+  Reducer _last_value → {summary: "...", sent: true}  ✅
+
+Field: current_agent
+  Current: "remediation"
+  Agent 3 returns: "cookbook"
+  Agent 4 returns: "jira_ticket"
+  Agent 5 returns: "notification"
+  Reducer _last_value → "notification" (whichever finishes last wins)
+```
+
+#### Step 5: Final State Returned (`graph.py` line 163)
+
+```python
+result = compiled.invoke(initial_state)  # returns the fully populated state
+```
+
+```
+Final state (what "result" contains):
+┌───────────────────────────────────────────────────────┐
+│ raw_logs: "2026-02-13 ERROR [auth] Login failed..."   │  (original input)
+│ file_name: "microservices_mixed.log"                  │  (original input)
+│ log_entries: [{...}, {...}, {...}, ...]                │  (Agent 1 wrote)
+│ issues: [{severity: "CRITICAL", ...}, ...]            │  (Agent 2 wrote)
+│ cookbook: "# Incident Remediation Cookbook\n..."        │  (Agent 3 wrote)
+│ jira_tickets: [{summary: "OOM Kill", ...}, ...]       │  (Agent 4 wrote)
+│ notification: {summary: "...", sent: true, ...}       │  (Agent 5 wrote)
+│ current_agent: "notification"                         │  (last agent to finish)
+│ error: ""                                             │  (no errors)
+└───────────────────────────────────────────────────────┘
+```
+
+This dict is then handed to `app.py` which displays it across the 5 tabs.
+
+#### The Complete Journey
+
+```
+initial_state (empty)
+       │
+       │  compiled.invoke()
+       ▼
+  ┌─────────┐     reads: raw_logs
+  │ Agent 1  │──── writes: log_entries ──────────────────┐
+  └─────────┘                                            │
+       │                                            merge into state
+       ▼                                                 │
+  ┌─────────┐     reads: log_entries                     │
+  │ Agent 2  │──── writes: issues ───────────────────────┤
+  └─────────┘                                            │
+       │                                            merge into state
+       ├────────────────┬────────────────┐               │
+       ▼                ▼                ▼               │
+  ┌─────────┐     ┌─────────┐     ┌─────────┐          │
+  │ Agent 3  │     │ Agent 4  │     │ Agent 5  │          │
+  │writes:   │     │writes:   │     │writes:   │          │
+  │cookbook   │     │jira_     │     │notifi-   │          │
+  │          │     │tickets   │     │cation    │          │
+  └────┬─────┘     └────┬─────┘     └────┬─────┘          │
+       │                │                │               │
+       └────────────────┴────────────────┘               │
+                        │                           merge using
+                        │                           REDUCERS
+                        ▼                                │
+                  final state ◄──────────────────────────┘
+                        │
+                        ▼
+                 returned to app.py
+```
+
+The state is just a dictionary that gets **progressively enriched** as it passes through each agent. LangGraph is the traffic controller — it decides which agent gets the state, collects their partial updates, merges them using the reducers, and passes the enriched state to the next agent.
 
 ---
 
