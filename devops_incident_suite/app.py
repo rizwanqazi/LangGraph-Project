@@ -88,7 +88,7 @@ with st.sidebar:
     _watch_dir = os.path.join(_app_dir, "live_logs")
     _processed_dir = os.path.join(_watch_dir, "processed")
 
-    watcher_on = st.toggle("Enable Watcher", value=False)
+    watcher_on = st.toggle("Enable Watcher", value=True)
 
     if watcher_on:
         # Start watcher if not already running
