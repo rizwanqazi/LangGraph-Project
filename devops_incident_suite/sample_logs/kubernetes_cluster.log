@@ -1,0 +1,28 @@
+2024-12-03 06:00:01 INFO [kube-scheduler] Scheduler started, watching for unscheduled pods
+2024-12-03 06:00:02 INFO [kube-apiserver] API server listening on port 6443
+2024-12-03 06:00:05 INFO [etcd] Member 1a2b3c ready, cluster size 3
+2024-12-03 06:01:30 WARN [kubelet-node04] Pod default/web-frontend-7d9b6-xk2lp evicted due to memory pressure
+2024-12-03 06:01:31 WARN [kubelet-node04] Node memory usage at 94% (15.04GB/16GB) — eviction threshold exceeded
+2024-12-03 06:01:35 ERROR [kubelet-node04] Pod default/web-frontend-7d9b6-xk2lp failed to restart: CrashLoopBackOff (backoff 5m0s)
+2024-12-03 06:02:00 WARN [kube-scheduler] 0/6 nodes available: 1 node has memory pressure, 2 nodes have disk pressure, 3 nodes are schedulable
+2024-12-03 06:05:10 CRITICAL [etcd] Disk latency exceeded 100ms threshold — current: 340ms on node etcd-02
+2024-12-03 06:05:12 ERROR [etcd] Leader election timeout: failed to reach quorum in 5s
+2024-12-03 06:05:13 CRITICAL [kube-apiserver] Etcd cluster unhealthy — 503 responses from etcd-02
+2024-12-03 06:05:15 ERROR [kube-apiserver] Watch stream broken for resource deployments.apps — reconnecting
+2024-12-03 06:05:20 WARN [kube-controller-manager] ReplicaSet web-frontend-7d9b6 has 2/5 available replicas
+2024-12-03 06:06:00 INFO [kubelet-node01] Successfully pulled image registry.internal/web-frontend:v3.2.1
+2024-12-03 06:06:05 ERROR [kubelet-node01] Container web-frontend failed liveness probe: HTTP GET http://localhost:8080/health returned 503
+2024-12-03 06:06:06 ERROR [kubelet-node01] Container web-frontend failed liveness probe 3 consecutive times — restarting
+2024-12-03 06:07:00 WARN [coredns] DNS resolution latency spike: avg 450ms (normal: <10ms) for cluster.local queries
+2024-12-03 06:07:01 ERROR [coredns] Upstream DNS server 10.0.0.2:53 unreachable — SERVFAIL for external queries
+2024-12-03 06:08:00 INFO [ingress-nginx] Reloaded configuration after ConfigMap update
+2024-12-03 06:08:10 WARN [ingress-nginx] Backend web-frontend-svc:80 has 0 healthy endpoints
+2024-12-03 06:08:15 ERROR [ingress-nginx] Returning 502 Bad Gateway for requests to app.example.com — no healthy upstream
+2024-12-03 06:10:00 WARN [prometheus] Alert firing: KubeNodeNotReady — node04 not ready for 5m
+2024-12-03 06:10:01 WARN [prometheus] Alert firing: KubePodCrashLooping — web-frontend in namespace default
+2024-12-03 06:10:02 CRITICAL [prometheus] Alert firing: EtcdClusterUnavailable — etcd quorum lost
+2024-12-03 06:12:00 INFO [kubelet-node04] Node memory reclaimed after evictions — usage at 72%
+2024-12-03 06:12:30 INFO [etcd] Disk latency recovered to 15ms on node etcd-02
+2024-12-03 06:12:35 INFO [etcd] Leader elected: etcd-01, cluster healthy
+2024-12-03 06:13:00 INFO [kube-apiserver] Etcd connection restored — all watchers re-established
+2024-12-03 06:15:00 INFO [kube-controller-manager] ReplicaSet web-frontend-7d9b6 scaled to 5/5 available replicas

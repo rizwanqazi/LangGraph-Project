@@ -1,0 +1,36 @@
+2025-01-15 09:00:00 INFO [github-webhook] Push event received on branch main by user sarah.dev — commit abc1234
+2025-01-15 09:00:01 INFO [jenkins-controller] Build #847 triggered for repo payments-api on branch main
+2025-01-15 09:00:05 INFO [jenkins-agent-03] Workspace prepared, checking out commit abc1234
+2025-01-15 09:00:30 INFO [jenkins-agent-03] Running stage: Install Dependencies
+2025-01-15 09:01:15 WARN [jenkins-agent-03] npm WARN deprecated querystring@0.2.1: The querystring API is considered Legacy
+2025-01-15 09:01:16 WARN [jenkins-agent-03] npm WARN 3 moderate severity vulnerabilities found in dependencies
+2025-01-15 09:01:30 INFO [jenkins-agent-03] Dependencies installed in 60s (1,247 packages)
+2025-01-15 09:01:35 INFO [jenkins-agent-03] Running stage: Lint
+2025-01-15 09:01:50 INFO [jenkins-agent-03] ESLint passed: 0 errors, 2 warnings
+2025-01-15 09:02:00 INFO [jenkins-agent-03] Running stage: Unit Tests
+2025-01-15 09:03:30 ERROR [jenkins-agent-03] FAIL src/services/payment.test.ts — PaymentService.processRefund: expected status 200, got 500
+2025-01-15 09:03:31 ERROR [jenkins-agent-03] FAIL src/services/payment.test.ts — PaymentService.processRefund: TypeError: Cannot read property 'amount' of undefined
+2025-01-15 09:03:32 WARN [jenkins-agent-03] Test suite: 142 passed, 2 failed, 144 total — coverage: 78% (threshold: 80%)
+2025-01-15 09:03:33 ERROR [jenkins-agent-03] Build #847 stage Unit Tests FAILED — blocking deployment
+2025-01-15 09:03:35 INFO [jenkins-controller] Notifying PR #312 with build failure status
+2025-01-15 09:10:00 INFO [github-webhook] Push event received on branch main by user sarah.dev — commit def5678 (fix: refund null check)
+2025-01-15 09:10:01 INFO [jenkins-controller] Build #848 triggered for repo payments-api on branch main
+2025-01-15 09:12:00 INFO [jenkins-agent-03] Unit Tests passed: 144/144 — coverage: 82%
+2025-01-15 09:12:05 INFO [jenkins-agent-03] Running stage: Integration Tests
+2025-01-15 09:14:30 ERROR [jenkins-agent-03] Integration test timeout: test_concurrent_payments exceeded 120s limit
+2025-01-15 09:14:31 WARN [jenkins-agent-03] Integration test environment: Docker container payment-db ran out of memory (512MB limit)
+2025-01-15 09:14:32 ERROR [jenkins-agent-03] Build #848 stage Integration Tests FAILED
+2025-01-15 09:15:00 INFO [jenkins-controller] Build #848 marked as UNSTABLE — unit tests pass, integration tests fail
+2025-01-15 09:20:00 INFO [github-webhook] Push event on branch main by user sarah.dev — commit ghi9012 (chore: increase test container memory)
+2025-01-15 09:20:01 INFO [jenkins-controller] Build #849 triggered for repo payments-api on branch main
+2025-01-15 09:24:00 INFO [jenkins-agent-03] All tests passed: 144 unit, 38 integration — coverage: 82%
+2025-01-15 09:24:05 INFO [jenkins-agent-03] Running stage: Docker Build
+2025-01-15 09:25:00 INFO [jenkins-agent-03] Docker image payments-api:abc1234 built in 55s (size: 342MB)
+2025-01-15 09:25:05 WARN [jenkins-agent-03] Docker image size exceeds recommended limit of 300MB
+2025-01-15 09:25:10 INFO [jenkins-agent-03] Running stage: Security Scan
+2025-01-15 09:25:45 WARN [trivy-scanner] Vulnerability found: CVE-2024-9876 (HIGH) in node:18-alpine base image
+2025-01-15 09:25:46 WARN [trivy-scanner] Vulnerability found: CVE-2024-8765 (MEDIUM) in openssl 3.1.4
+2025-01-15 09:25:47 ERROR [trivy-scanner] Security scan FAILED: 1 HIGH severity vulnerability exceeds policy threshold
+2025-01-15 09:25:48 CRITICAL [jenkins-agent-03] Build #849 BLOCKED by security policy — cannot deploy with HIGH+ vulnerabilities
+2025-01-15 09:26:00 INFO [jenkins-controller] Build #849 status: FAILED — security gate blocked deployment
+2025-01-15 09:26:01 INFO [slack-bot] Notification sent to #deployments: Build #849 blocked by security scan

@@ -1,0 +1,33 @@
+2024-11-15 08:00:01 INFO [api-gateway] Server started on port 8080
+2024-11-15 08:00:02 INFO [auth-service] Connected to Redis session store at redis://localhost:6379
+2024-11-15 08:00:03 INFO [user-service] Database migration completed successfully
+2024-11-15 08:01:15 INFO [api-gateway] Health check passed — all upstream services healthy
+2024-11-15 08:05:22 WARN [user-service] Slow query detected: SELECT * FROM users WHERE last_login < ? took 3200ms
+2024-11-15 08:05:23 WARN [user-service] Connection pool utilization at 85% (17/20 connections)
+2024-11-15 08:10:45 ERROR [auth-service] Failed to authenticate user jdoe@example.com: invalid credentials (attempt 3/5)
+2024-11-15 08:10:46 WARN [auth-service] Brute force threshold approaching for IP 203.0.113.42 (4 failed attempts in 60s)
+2024-11-15 08:10:50 ERROR [auth-service] Failed to authenticate user jdoe@example.com: invalid credentials (attempt 4/5)
+2024-11-15 08:10:55 CRITICAL [auth-service] Account locked: jdoe@example.com — max failed attempts exceeded from IP 203.0.113.42
+2024-11-15 08:15:30 WARN [storage-service] Disk usage on /data at 88% (440GB/500GB) — threshold is 85%
+2024-11-15 08:15:31 WARN [storage-service] Log rotation has not run in 72 hours — last run: 2024-11-12 08:00:00
+2024-11-15 08:20:10 ERROR [payment-service] Connection timeout to payment gateway https://pay.example.com after 30000ms
+2024-11-15 08:20:12 ERROR [payment-service] Retry 1/3 failed: Connection timeout to payment gateway
+2024-11-15 08:20:15 ERROR [payment-service] Retry 2/3 failed: Connection timeout to payment gateway
+2024-11-15 08:20:18 CRITICAL [payment-service] Payment gateway unreachable after 3 retries — circuit breaker OPEN
+2024-11-15 08:20:19 ERROR [order-service] Cannot process order ORD-98234: payment service unavailable
+2024-11-15 08:25:00 INFO [scheduler] Cron job backup-db started
+2024-11-15 08:25:45 INFO [scheduler] Cron job backup-db completed in 45s
+2024-11-15 08:30:00 WARN [api-gateway] Request rate approaching limit: 450/500 req/s from client app-mobile-v2
+2024-11-15 08:32:10 ERROR [user-service] OutOfMemoryError: Java heap space — current heap 1.8GB/2GB
+2024-11-15 08:32:11 CRITICAL [user-service] Service user-service crashed: java.lang.OutOfMemoryError
+2024-11-15 08:32:12 ERROR [api-gateway] Upstream service user-service returned 503 Service Unavailable
+2024-11-15 08:32:15 INFO [orchestrator] Restarting user-service (attempt 1/3)
+2024-11-15 08:32:45 INFO [user-service] Service restarted successfully
+2024-11-15 08:35:00 WARN [monitoring] Alert: CPU usage on node worker-03 sustained above 90% for 5 minutes
+2024-11-15 08:40:00 INFO [api-gateway] Deployed version v2.4.1 of order-service
+2024-11-15 08:40:05 ERROR [order-service] NullPointerException at OrderController.java:142 — missing field 'shipping_address' in request payload
+2024-11-15 08:40:06 ERROR [order-service] NullPointerException at OrderController.java:142 — missing field 'shipping_address' in request payload
+2024-11-15 08:40:07 WARN [order-service] Error rate spike detected: 15% of requests failing (threshold: 5%)
+2024-11-15 08:40:10 CRITICAL [order-service] Auto-rollback triggered: reverting order-service from v2.4.1 to v2.4.0
+2024-11-15 08:40:30 INFO [order-service] Rollback complete — order-service v2.4.0 restored
+2024-11-15 08:45:00 INFO [api-gateway] Health check passed — all upstream services healthy

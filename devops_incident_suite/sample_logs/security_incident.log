@@ -1,0 +1,26 @@
+2025-02-08 02:00:00 INFO [firewall] Daily rule sync completed — 14,230 rules active
+2025-02-08 02:00:01 INFO [ids-sensor] Snort IDS signatures updated: v2.9.20-20250208
+2025-02-08 02:15:33 WARN [auth-service] Failed login for admin@company.com from IP 185.220.101.34 (TOR exit node)
+2025-02-08 02:15:34 WARN [auth-service] Failed login for admin@company.com from IP 185.220.101.34 — invalid password
+2025-02-08 02:15:35 WARN [auth-service] Failed login for admin@company.com from IP 185.220.101.35 — invalid password
+2025-02-08 02:15:36 WARN [auth-service] Failed login for admin@company.com from IP 185.220.101.36 — invalid password
+2025-02-08 02:15:37 CRITICAL [auth-service] Brute force attack detected: 50 failed logins for admin@company.com from 12 IPs in 60s
+2025-02-08 02:15:38 INFO [auth-service] Auto-blocked IP range 185.220.101.0/24 for 24 hours
+2025-02-08 02:20:00 WARN [waf] SQL injection attempt blocked: GET /api/users?id=1'+OR+'1'='1 from IP 91.215.85.17
+2025-02-08 02:20:01 WARN [waf] SQL injection attempt blocked: POST /api/login body contains UNION SELECT from IP 91.215.85.17
+2025-02-08 02:20:02 WARN [waf] XSS attempt blocked: POST /api/comments body contains <script> from IP 91.215.85.17
+2025-02-08 02:20:05 INFO [waf] Auto-blocked IP 91.215.85.17 after 3 attack signatures in 10s
+2025-02-08 03:00:00 ERROR [cert-manager] TLS certificate for api.company.com expires in 3 days — auto-renewal failed
+2025-02-08 03:00:01 ERROR [cert-manager] ACME challenge failed: DNS-01 validation timeout for api.company.com
+2025-02-08 03:00:02 WARN [cert-manager] Falling back to HTTP-01 challenge — retry scheduled in 1 hour
+2025-02-08 04:30:00 CRITICAL [audit-log] Privilege escalation detected: user dev_intern assumed role admin via IAM policy misconfiguration
+2025-02-08 04:30:01 CRITICAL [audit-log] User dev_intern (via admin role) accessed S3 bucket s3://company-secrets/credentials/
+2025-02-08 04:30:02 CRITICAL [audit-log] User dev_intern (via admin role) downloaded 14 files from s3://company-secrets/credentials/
+2025-02-08 04:30:05 INFO [siem] Alert triggered: Unauthorized access to sensitive S3 bucket — incident INC-2025-0208-001
+2025-02-08 04:30:10 INFO [auth-service] Emergency: revoked all sessions for user dev_intern
+2025-02-08 04:30:15 INFO [iam-service] Emergency: detached admin policy from dev_intern role
+2025-02-08 05:00:00 WARN [vulnerability-scanner] CVE-2025-1234 (CVSS 9.8) detected in dependency log4j-core:2.14.0 — used by reporting-service
+2025-02-08 05:00:01 WARN [vulnerability-scanner] CVE-2025-1235 (CVSS 7.5) detected in dependency jackson-databind:2.13.0 — used by api-gateway
+2025-02-08 05:00:02 ERROR [vulnerability-scanner] 2 CRITICAL and 5 HIGH severity vulnerabilities found in production images
+2025-02-08 06:00:00 INFO [firewall] Geo-blocking updated: added 3 new OFAC-sanctioned IP ranges
+2025-02-08 06:00:01 INFO [ids-sensor] 24-hour summary: 847 alerts, 12 high-severity, 3 critical incidents

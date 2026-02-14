@@ -1,0 +1,27 @@
+2025-01-20 14:00:00 INFO [postgres-primary] Checkpoint complete: wrote 12847 buffers (9.8%), 0 WAL file(s) added
+2025-01-20 14:00:01 INFO [connection-pooler] PgBouncer stats: 45 active, 155 idle, 0 waiting connections
+2025-01-20 14:02:30 WARN [postgres-primary] Autovacuum launcher: skipping table public.events — last vacuum 14 days ago, 2.3M dead tuples
+2025-01-20 14:02:31 WARN [postgres-primary] Table public.events bloat estimated at 40% — consider manual VACUUM FULL
+2025-01-20 14:05:00 WARN [connection-pooler] Connection pool utilization at 90% (180/200) — approaching max_connections
+2025-01-20 14:05:10 ERROR [app-backend] Query timeout after 30s: SELECT * FROM events WHERE user_id = $1 ORDER BY created_at DESC — seq scan on 48M rows
+2025-01-20 14:05:11 WARN [postgres-primary] Slow query log: duration 31204.532ms — missing index on events.user_id
+2025-01-20 14:05:45 ERROR [app-backend] Query timeout after 30s: SELECT count(*) FROM events WHERE status = 'pending' — seq scan detected
+2025-01-20 14:06:00 ERROR [connection-pooler] Max connections reached (200/200) — rejecting new connections
+2025-01-20 14:06:01 ERROR [connection-pooler] 23 clients waiting in queue, oldest waiting 8.2s
+2025-01-20 14:06:02 ERROR [app-backend] Database connection failed: FATAL too many connections for role "app_user"
+2025-01-20 14:06:03 ERROR [app-backend] Database connection failed: FATAL too many connections for role "app_user"
+2025-01-20 14:06:10 CRITICAL [app-backend] Circuit breaker OPEN for database connections — 15 failures in 60s
+2025-01-20 14:06:11 ERROR [api-gateway] Upstream app-backend returning 503 for all /api/events endpoints
+2025-01-20 14:07:00 WARN [postgres-replica-01] Replication lag: 45s behind primary (threshold: 10s)
+2025-01-20 14:07:01 WARN [postgres-replica-02] Replication lag: 52s behind primary (threshold: 10s)
+2025-01-20 14:07:30 CRITICAL [postgres-primary] PANIC: could not write to WAL file — disk space on /pgdata at 99.2% (495.8GB/500GB)
+2025-01-20 14:07:31 CRITICAL [postgres-primary] Database server shutting down due to WAL write failure
+2025-01-20 14:07:32 ERROR [connection-pooler] Lost connection to primary database server
+2025-01-20 14:07:33 CRITICAL [app-backend] All database connections lost — service completely unavailable
+2025-01-20 14:08:00 INFO [failover-manager] Detected primary failure — initiating automatic failover
+2025-01-20 14:08:05 INFO [failover-manager] Promoting postgres-replica-01 to primary
+2025-01-20 14:08:15 WARN [failover-manager] New primary has 45s replication lag — potential data loss window
+2025-01-20 14:08:30 INFO [failover-manager] Failover complete — postgres-replica-01 is now primary
+2025-01-20 14:08:35 INFO [connection-pooler] Reconnected to new primary postgres-replica-01
+2025-01-20 14:09:00 INFO [app-backend] Database connections re-established — service recovering
+2025-01-20 14:10:00 WARN [postgres-primary-old] OFFLINE — disk full, requires manual intervention to clear WAL files
