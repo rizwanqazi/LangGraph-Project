@@ -1,0 +1,20 @@
+2024-12-20 05:00:01 INFO [node-monitor] Cluster node status: 6/6 nodes healthy, disk usage nominal
+2024-12-20 05:00:02 INFO [log-aggregator] Elasticsearch ingestion rate: 4200 docs/s across 5 indices
+2024-12-20 05:30:00 WARN [node-monitor] Node db-worker-02 disk usage at 82% on /var/lib/postgresql (threshold: 80%)
+2024-12-20 05:30:15 WARN [log-aggregator] Elasticsearch index logs-2024.12.20 shard size at 48GB — approaching 50GB limit
+2024-12-20 05:45:00 ERROR [node-monitor] Node db-worker-02 disk usage at 91% — CRITICAL threshold breached
+2024-12-20 05:45:01 WARN [postgres-primary] WAL segments accumulating: 340 segments (12GB) — archiver lagging
+2024-12-20 05:45:15 ERROR [postgres-primary] PANIC: could not write to WAL file — no space left on device
+2024-12-20 05:45:16 CRITICAL [postgres-primary] Database entering recovery mode — all write transactions aborted
+2024-12-20 05:45:30 ERROR [app-backend] Database write failed: INSERT INTO orders — connection in read-only mode
+2024-12-20 05:45:45 ERROR [app-backend] 45 API requests failed with 500 — database unavailable for writes
+2024-12-20 05:46:00 WARN [log-aggregator] Elasticsearch rejecting new documents: disk watermark exceeded on node es-data-01
+2024-12-20 05:46:15 ERROR [log-aggregator] Log ingestion pipeline stalled: 8000 documents buffered in memory
+2024-12-20 05:47:00 INFO [node-monitor] Emergency cleanup: purging old WAL segments older than 24h
+2024-12-20 05:47:30 INFO [node-monitor] Freed 8.5GB on db-worker-02 — disk usage at 73%
+2024-12-20 05:48:00 INFO [postgres-primary] WAL writer resumed — accepting write transactions
+2024-12-20 05:48:15 INFO [app-backend] Database connection restored — processing queued requests
+2024-12-20 05:49:00 INFO [log-aggregator] Elasticsearch accepting documents again — flushing 8000 buffered docs
+2024-12-20 05:50:00 WARN [node-monitor] Disk growth rate: 2.1GB/day on db-worker-02 — will hit 90% again in 8 days
+2024-12-20 05:50:01 WARN [log-aggregator] Schedule index lifecycle management: rotate logs-2024.12.20 at 50GB
+2024-12-20 05:50:02 WARN [postgres-primary] Review WAL archival config — archive_command failing intermittently

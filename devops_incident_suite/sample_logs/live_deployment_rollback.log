@@ -1,0 +1,16 @@
+2024-12-19 14:00:01 INFO [deploy-controller] Rolling deployment started: checkout-service v4.8.0 → v4.9.0 (canary 10%)
+2024-12-19 14:00:15 INFO [deploy-controller] Canary pod checkout-v49-abc12 running — routing 10% traffic
+2024-12-19 14:01:00 INFO [metrics-collector] Canary baseline established: error rate 0.1%, latency p99 120ms
+2024-12-19 14:03:00 WARN [metrics-collector] Canary error rate rising: 4.2% (threshold: 2%)
+2024-12-19 14:03:15 ERROR [checkout-service] NullReferenceException in PaymentProcessor.cs:287 — new payment provider SDK returning null
+2024-12-19 14:03:30 ERROR [checkout-service] 12 failed checkouts in canary pod — customers seeing "Payment Error" page
+2024-12-19 14:04:00 WARN [deploy-controller] Canary analysis FAILED: error rate 6.8% exceeds 2% threshold
+2024-12-19 14:04:01 INFO [deploy-controller] Automatic rollback initiated: checkout-service v4.9.0 → v4.8.0
+2024-12-19 14:04:15 INFO [deploy-controller] Canary pod checkout-v49-abc12 terminated — traffic rerouted to v4.8.0
+2024-12-19 14:04:30 INFO [deploy-controller] Rollback complete: checkout-service v4.8.0 stable (3/3 pods)
+2024-12-19 14:04:45 WARN [order-service] 8 orders stuck in PAYMENT_PENDING — created during canary failure window
+2024-12-19 14:05:00 ERROR [order-service] Order ORD-44219 payment callback never received — marking for manual review
+2024-12-19 14:05:15 WARN [notification-service] 8 order confirmation emails queued but not sent — waiting on payment resolution
+2024-12-19 14:05:30 INFO [metrics-collector] Error rate back to baseline: 0.1% after rollback
+2024-12-19 14:06:00 WARN [deploy-controller] v4.9.0 deployment blocked — requires bug fix before retry
+2024-12-19 14:06:01 WARN [order-service] Manual intervention needed: 8 orphaned orders from failed canary

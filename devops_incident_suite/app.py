@@ -56,11 +56,12 @@ with st.sidebar:
 
     slack_mode = st.radio(
         "Slack Notifications",
-        ["Dry Run (mock)", "Live (send via webhook)"],
+        ["Live (send via webhook)", "Dry Run (mock)"],
         index=0,
     )
     if slack_mode.startswith("Live"):
-        webhook = st.text_input("Slack Webhook URL", type="password")
+        env_webhook = os.getenv("SLACK_WEBHOOK_URL", "")
+        webhook = st.text_input("Slack Webhook URL", value=env_webhook, type="password")
         if webhook:
             os.environ["SLACK_WEBHOOK_URL"] = webhook
     else:

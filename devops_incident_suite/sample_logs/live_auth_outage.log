@@ -1,0 +1,20 @@
+2024-12-18 22:00:01 INFO [auth-gateway] OAuth2 token service healthy: 340 tokens/s issued
+2024-12-18 22:00:02 INFO [session-store] Redis session backend connected: 12000 active sessions
+2024-12-18 22:10:00 WARN [auth-gateway] Token validation latency increasing: p95 at 600ms (baseline: 50ms)
+2024-12-18 22:10:15 ERROR [session-store] Redis connection lost: ECONNREFUSED on redis-primary:6379
+2024-12-18 22:10:16 ERROR [auth-gateway] Session lookup failed for 230 active requests — falling back to DB
+2024-12-18 22:10:30 WARN [auth-gateway] Database session fallback overloaded: query time 2800ms
+2024-12-18 22:10:45 ERROR [user-api] 401 Unauthorized spike: 180 requests rejected in 15s — token validation timeout
+2024-12-18 22:11:00 CRITICAL [auth-gateway] Token issuance halted: cannot verify signing keys — JWKS endpoint unreachable
+2024-12-18 22:11:01 ERROR [user-api] All authenticated endpoints returning 503 — auth dependency down
+2024-12-18 22:11:15 ERROR [mobile-backend] Login flow broken: POST /oauth/token returning 500
+2024-12-18 22:11:30 WARN [rate-limiter] Retry flood from mobile clients: 1200 req/s on /oauth/token (baseline: 200)
+2024-12-18 22:12:00 WARN [session-store] Attempting reconnection to redis-replica:6380
+2024-12-18 22:12:15 INFO [session-store] Connected to redis-replica — read-only mode
+2024-12-18 22:12:30 WARN [auth-gateway] Serving cached tokens from replica — new logins still blocked
+2024-12-18 22:13:00 INFO [session-store] Redis primary recovered: redis-primary:6379 accepting connections
+2024-12-18 22:13:15 INFO [auth-gateway] JWKS endpoint reachable — resuming token issuance
+2024-12-18 22:13:30 INFO [auth-gateway] Token validation latency normalized: p95 at 45ms
+2024-12-18 22:14:00 INFO [user-api] Authenticated endpoints returning 200 — service restored
+2024-12-18 22:14:01 WARN [auth-gateway] Post-incident: 430 sessions invalidated during outage — users must re-login
+2024-12-18 22:15:00 WARN [session-store] Investigate Redis primary crash: OOM killer triggered on host
