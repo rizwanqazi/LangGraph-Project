@@ -1,0 +1,22 @@
+2024-12-10 16:00:01 INFO [s3-sync] Cross-region replication healthy: us-east-1 → eu-west-1 (lag: 2s)
+2024-12-10 16:00:02 INFO [backup-service] Daily backup schedule on track — next run at 18:00 UTC
+2024-12-10 16:10:00 WARN [s3-sync] Replication lag increasing: us-east-1 → eu-west-1 now at 45s (threshold: 30s)
+2024-12-10 16:10:30 WARN [cost-monitor] S3 storage costs up 34% this week — anomalous growth in bucket prod-data-lake
+2024-12-10 16:11:00 ERROR [storage-proxy] PUT request failed for s3://prod-uploads/batch-2024-12-10/chunk-447.parquet — 503 SlowDown
+2024-12-10 16:11:15 ERROR [storage-proxy] PUT request failed: 503 SlowDown — request rate exceeds prefix limit
+2024-12-10 16:11:30 WARN [storage-proxy] Throttled requests: 23 PUT failures in last 60s on prefix /batch-2024-12-10/
+2024-12-10 16:12:00 ERROR [replication-agent] Replication backlog growing: 1200 objects pending sync to eu-west-1
+2024-12-10 16:12:30 WARN [s3-sync] Replication lag at 180s — SLA breach threshold is 300s
+2024-12-10 16:13:00 ERROR [storage-proxy] Cross-account access denied: bucket prod-analytics — bucket policy blocks role from account 987654
+2024-12-10 16:13:01 ERROR [storage-proxy] GetObject failed: AccessDenied for s3://prod-analytics/reports/daily-summary.json
+2024-12-10 16:13:30 WARN [backup-service] Backup pre-check warning: source bucket prod-uploads has 503 errors — backup may be incomplete
+2024-12-10 16:14:00 INFO [storage-proxy] Implementing request spreading across 8 prefixes to reduce throttling
+2024-12-10 16:14:30 INFO [storage-proxy] PUT success rate recovering: 95% (was 67%)
+2024-12-10 16:15:00 WARN [replication-agent] Replication backlog at 800 objects — draining at 50 obj/s
+2024-12-10 16:15:30 WARN [cost-monitor] Root cause of cost spike: lifecycle policy disabled on prod-data-lake 3 days ago
+2024-12-10 16:16:00 INFO [cost-monitor] Lifecycle policy re-enabled — transition to Glacier after 30 days
+2024-12-10 16:17:00 ERROR [storage-proxy] Cross-account access still blocked — IAM policy update required for account 987654
+2024-12-10 16:18:00 INFO [s3-sync] Replication lag recovering: 90s and decreasing
+2024-12-10 16:20:00 INFO [replication-agent] Replication backlog cleared — all objects synced to eu-west-1
+2024-12-10 16:20:01 INFO [s3-sync] Replication lag nominal: 3s
+2024-12-10 16:25:00 WARN [storage-proxy] Unresolved: cross-account access to prod-analytics requires IAM policy update

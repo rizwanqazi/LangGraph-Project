@@ -1,0 +1,23 @@
+2024-12-11 06:00:01 INFO [prometheus] Scrape cycle completed: 142/142 targets healthy
+2024-12-11 06:00:02 INFO [grafana] Dashboard auto-refresh active — 23 dashboards, 5s interval
+2024-12-11 06:15:00 WARN [node-exporter] High memory pressure on node prod-worker-07: 93% utilized
+2024-12-11 06:15:30 ERROR [prometheus] Scrape failed for target prod-worker-07:9100 — connection refused
+2024-12-11 06:15:31 ERROR [prometheus] Scrape failed for target prod-worker-08:9100 — timeout after 10s
+2024-12-11 06:16:00 WARN [prometheus] 2 scrape targets down — metric gap forming for node_cpu_seconds_total
+2024-12-11 06:16:01 WARN [thanos-query] Partial response: 2 store nodes missing from query federation
+2024-12-11 06:16:30 ERROR [alertmanager] Alert flood: 47 alerts firing simultaneously — possible alert storm
+2024-12-11 06:16:31 WARN [alertmanager] Duplicate alerts detected: HighMemoryUsage firing 12 times for same node
+2024-12-11 06:17:00 WARN [alertmanager] Alert grouping overloaded — notification queue depth at 200
+2024-12-11 06:17:15 ERROR [alertmanager] Slack notification failed for group prod-critical: webhook returned 429 rate limited
+2024-12-11 06:17:30 WARN [grafana] Dashboard prod-overview query timeout after 30s — PromQL query too expensive
+2024-12-11 06:18:00 ERROR [grafana] 5 panels showing "No Data" on prod-overview dashboard — metric gaps from scrape failures
+2024-12-11 06:18:30 CRITICAL [prometheus] Storage TSDB compaction failed: disk full on /prometheus/data (95% used)
+2024-12-11 06:18:31 ERROR [prometheus] Write-ahead log stalled — cannot accept new samples
+2024-12-11 06:19:00 WARN [thanos-query] Query latency degraded: p99 at 15s (baseline: 2s)
+2024-12-11 06:19:30 INFO [prometheus] Emergency: pruning old TSDB blocks to free disk space
+2024-12-11 06:20:00 INFO [prometheus] Freed 12GB by removing blocks older than 15 days (was 30 days retention)
+2024-12-11 06:20:30 INFO [prometheus] TSDB compaction resumed — write-ahead log processing
+2024-12-11 06:21:00 INFO [prometheus] Scrape targets recovering: prod-worker-07 responding again
+2024-12-11 06:21:30 INFO [alertmanager] Alert storm subsiding: 12 alerts firing (was 47)
+2024-12-11 06:22:00 WARN [alertmanager] 35 alerts resolved — review deduplication rules to prevent future storms
+2024-12-11 06:22:01 INFO [grafana] Dashboard prod-overview panels populating again — metric gaps filled

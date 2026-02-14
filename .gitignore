@@ -19,6 +19,9 @@ build/
 *.swp
 *.swo
 
+# Live watcher processed files
+devops_incident_suite/live_logs/processed/
+
 # OS
 .DS_Store
 Thumbs.db

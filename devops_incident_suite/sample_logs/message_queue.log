@@ -1,0 +1,24 @@
+2024-12-07 11:00:01 INFO [kafka-broker] Cluster healthy: 5 brokers, 120 partitions, replication factor 3
+2024-12-07 11:00:02 INFO [consumer-group] Consumer group order-processors lag: 15 messages (nominal)
+2024-12-07 11:05:30 WARN [consumer-group] Consumer order-proc-3 heartbeat missed — potential slow processing
+2024-12-07 11:05:45 WARN [consumer-group] Consumer lag increasing: 2400 messages on topic order-events
+2024-12-07 11:06:00 ERROR [consumer-group] Consumer order-proc-3 disconnected — session timeout after 30s
+2024-12-07 11:06:01 INFO [kafka-broker] Partition rebalance triggered for consumer group order-processors
+2024-12-07 11:06:15 WARN [kafka-broker] Rebalance in progress — 8 partitions reassigning across 4 remaining consumers
+2024-12-07 11:06:30 WARN [consumer-group] Consumer lag spiking: 8500 messages on topic order-events during rebalance
+2024-12-07 11:07:00 ERROR [consumer-group] Consumer order-proc-1 failed processing: DeserializationException on message offset 445821
+2024-12-07 11:07:01 INFO [dlq-handler] Message routed to DLQ: order-events-dlq (offset 445821, key: ORD-77231)
+2024-12-07 11:07:15 WARN [dlq-handler] DLQ depth at 45 messages — 12 added in last hour
+2024-12-07 11:07:30 INFO [kafka-broker] Partition rebalance completed — 8 partitions distributed across 4 consumers
+2024-12-07 11:08:00 WARN [consumer-group] Post-rebalance lag still elevated: 6200 messages on order-events
+2024-12-07 11:08:30 WARN [producer-service] Producer backpressure activated: send buffer 85% full (buffer.memory=64MB)
+2024-12-07 11:09:00 ERROR [producer-service] Message delivery failed: TimeoutException — broker acknowledgment not received in 30s
+2024-12-07 11:09:01 WARN [producer-service] Retrying failed messages — 23 messages in retry queue
+2024-12-07 11:10:00 ERROR [zookeeper] Ephemeral node /brokers/ids/3 expired — broker-3 may be unresponsive
+2024-12-07 11:10:15 WARN [kafka-broker] Broker-3 offline — under-replicated partitions: 12
+2024-12-07 11:10:30 CRITICAL [kafka-broker] ISR shrunk below minimum for 4 partitions on topic order-events — writes may block
+2024-12-07 11:11:00 INFO [kafka-broker] Broker-3 rejoined cluster — triggering partition reassignment
+2024-12-07 11:11:30 INFO [consumer-group] Consumer lag recovering: 3100 messages and decreasing
+2024-12-07 11:12:00 WARN [dlq-handler] Review DLQ: 45 messages pending manual inspection
+2024-12-07 11:13:00 INFO [consumer-group] Consumer lag nominal: 80 messages — processing caught up
+2024-12-07 11:13:01 INFO [kafka-broker] All partitions fully replicated — cluster healthy

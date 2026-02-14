@@ -1,0 +1,25 @@
+2024-12-14 12:00:01 INFO [redis-primary] Redis 7.2 running — memory usage 6.2GB/8GB, 1.2M keys
+2024-12-14 12:00:02 INFO [redis-replica] Replication in sync with primary — offset lag: 0
+2024-12-14 12:00:03 INFO [connection-pool] Pool healthy: 45/100 connections in use across 12 app instances
+2024-12-14 12:10:00 WARN [redis-primary] Memory usage at 87% (7.0GB/8GB) — approaching maxmemory limit
+2024-12-14 12:10:15 WARN [redis-primary] Eviction policy triggered (allkeys-lru): 340 keys evicted in last 60s
+2024-12-14 12:10:30 WARN [cache-proxy] Cache miss rate increasing: 34% (baseline: 8%)
+2024-12-14 12:11:00 ERROR [app-server] Cache stampede detected: key product-catalog:top-100 evicted — 45 simultaneous cache misses
+2024-12-14 12:11:01 ERROR [app-server] Database query spike: 45 identical queries for product catalog in 2s
+2024-12-14 12:11:15 WARN [app-server] Response latency spiking: p99 at 3200ms (baseline: 150ms)
+2024-12-14 12:11:30 WARN [redis-primary] Eviction rate accelerating: 800 keys/min — memory at 91%
+2024-12-14 12:12:00 ERROR [redis-replica] Replication lag detected: 15000 bytes behind primary
+2024-12-14 12:12:15 WARN [cache-proxy] Read requests failing over to replica — stale data possible (lag: 3s)
+2024-12-14 12:12:30 ERROR [connection-pool] Pool exhaustion warning: 95/100 connections in use
+2024-12-14 12:12:45 CRITICAL [connection-pool] Connection pool exhausted: 100/100 — new requests queued (queue depth: 230)
+2024-12-14 12:13:00 ERROR [app-server] Redis connection timeout after 5000ms — request failed
+2024-12-14 12:13:15 ERROR [app-server] 12 requests failed due to Redis connection pool exhaustion
+2024-12-14 12:13:30 INFO [redis-primary] Emergency: increasing maxmemory to 10GB (was 8GB)
+2024-12-14 12:13:45 INFO [redis-primary] Eviction rate decreasing: memory at 70% after limit increase
+2024-12-14 12:14:00 INFO [cache-proxy] Implementing cache stampede protection: singleflight pattern for hot keys
+2024-12-14 12:14:30 INFO [connection-pool] Pool recovering: 60/100 connections in use (queue drained)
+2024-12-14 12:15:00 INFO [redis-replica] Replication caught up — offset lag: 0
+2024-12-14 12:15:30 INFO [app-server] Response latency normalizing: p99 at 200ms
+2024-12-14 12:16:00 WARN [cache-proxy] Cache miss rate still elevated at 18% — warm-up in progress
+2024-12-14 12:17:00 INFO [cache-proxy] Cache miss rate at 10% — approaching baseline
+2024-12-14 12:17:01 WARN [redis-primary] Schedule capacity review: memory growth trend suggests 16GB needed within 30 days

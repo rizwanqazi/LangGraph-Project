@@ -1,0 +1,25 @@
+2024-12-03 14:00:01 INFO [ec2-monitor] Routine health check started for us-east-1 fleet (47 instances)
+2024-12-03 14:00:05 INFO [cloudwatch] Metrics collection nominal — all dashboards updated
+2024-12-03 14:02:30 WARN [ec2-monitor] Instance i-0a3f7b health check failed: StatusCheckFailed_Instance on i-0a3f7b2d (us-east-1a)
+2024-12-03 14:02:31 WARN [ec2-monitor] Instance i-0a3f7b CPU steal time at 42% — possible noisy neighbor
+2024-12-03 14:03:00 ERROR [ec2-monitor] Instance i-0a3f7b unreachable — no response to ICMP or SSH for 30s
+2024-12-03 14:03:01 INFO [auto-scaler] Health check failure detected for i-0a3f7b — evaluating replacement
+2024-12-03 14:03:15 INFO [auto-scaler] Launching replacement instance in us-east-1a (ASG: prod-web-asg, desired: 12)
+2024-12-03 14:03:16 ERROR [iam-service] AssumeRole failed for arn:aws:iam::123456:role/EC2LaunchRole — AccessDenied
+2024-12-03 14:03:17 ERROR [auto-scaler] Cannot launch replacement: IAM role assumption failed — AssumeRole denied
+2024-12-03 14:03:45 WARN [ec2-monitor] Second instance failing: i-0b8c3e health check failed in us-east-1a
+2024-12-03 14:04:00 CRITICAL [auto-scaler] ASG prod-web-asg below minimum capacity (10/12) — cannot launch replacements due to IAM failure
+2024-12-03 14:04:01 ERROR [cloudwatch] Alarm HighErrorRate triggered: 5xx rate at 18% (threshold: 5%)
+2024-12-03 14:04:30 WARN [route53] Health check failing for us-east-1 endpoint — 2 consecutive failures
+2024-12-03 14:05:00 INFO [route53] Initiating DNS failover from us-east-1 to us-west-2
+2024-12-03 14:05:01 INFO [route53] Updated weighted record: us-east-1 weight 0, us-west-2 weight 100
+2024-12-03 14:05:15 WARN [ec2-monitor] us-west-2 fleet receiving redirected traffic — CPU across fleet at 78%
+2024-12-03 14:05:30 INFO [auto-scaler] Scaling up us-west-2 ASG from 8 to 14 instances to absorb failover traffic
+2024-12-03 14:06:00 WARN [cloudwatch] us-west-2 response latency increasing: p99 at 1200ms (baseline: 300ms)
+2024-12-03 14:06:30 ERROR [iam-service] AssumeRole failed again — STS token expired, refreshing credentials
+2024-12-03 14:07:00 INFO [iam-service] STS credentials refreshed successfully — AssumeRole now permitted
+2024-12-03 14:07:15 INFO [auto-scaler] Replacement instance i-0d9f4a launched successfully in us-east-1a
+2024-12-03 14:07:45 INFO [auto-scaler] ASG prod-web-asg back to desired capacity (12/12)
+2024-12-03 14:08:00 INFO [route53] us-east-1 health check passing — initiating gradual traffic shift back
+2024-12-03 14:08:01 INFO [cloudwatch] Alarm HighErrorRate resolved: 5xx rate at 0.3%
+2024-12-03 14:10:00 WARN [ec2-monitor] Post-incident: investigate root cause of IAM role expiration on prod-web-asg

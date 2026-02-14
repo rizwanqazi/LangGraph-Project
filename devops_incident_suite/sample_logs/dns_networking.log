@@ -1,0 +1,23 @@
+2024-12-09 03:00:01 INFO [coredns] DNS resolver healthy: serving 1200 queries/s across 3 zones
+2024-12-09 03:00:02 INFO [service-mesh] Envoy sidecar proxies healthy: 48/48 endpoints connected
+2024-12-09 03:15:00 WARN [cert-manager] TLS certificate for *.internal.prod.co expires in 72 hours
+2024-12-09 03:15:01 WARN [cert-manager] Auto-renewal initiated for *.internal.prod.co via Let's Encrypt
+2024-12-09 03:15:30 ERROR [cert-manager] Certificate renewal failed: ACME challenge DNS-01 timed out after 120s
+2024-12-09 03:16:00 WARN [cert-manager] Retrying certificate renewal (attempt 2/5) — next attempt in 300s
+2024-12-09 03:20:15 ERROR [coredns] Resolution failed for payment-svc.internal.prod.co — NXDOMAIN
+2024-12-09 03:20:16 ERROR [coredns] Resolution failed for payment-svc.internal.prod.co — upstream DNS timeout after 5s
+2024-12-09 03:20:30 WARN [service-mesh] Endpoint payment-svc removed from load balancer — DNS lookup failed
+2024-12-09 03:20:45 ERROR [health-checker] Service payment-svc unreachable — connection refused on port 8443
+2024-12-09 03:21:00 WARN [network-controller] Network partition detected between us-east-1a and us-east-1c
+2024-12-09 03:21:01 ERROR [service-mesh] 12 cross-AZ connections dropped — TCP RST from network boundary
+2024-12-09 03:21:15 CRITICAL [network-controller] AZ us-east-1c isolated — no route to 10.0.64.0/18 subnet
+2024-12-09 03:21:30 ERROR [coredns] DNS query rate spiking: 4500 queries/s — retry flood from mesh proxies
+2024-12-09 03:21:45 WARN [coredns] Cache miss rate at 78% — upstream resolvers under pressure
+2024-12-09 03:22:00 WARN [health-checker] 8 services in us-east-1c failing health checks simultaneously
+2024-12-09 03:22:30 INFO [network-controller] BGP route restored to us-east-1c — connectivity recovering
+2024-12-09 03:23:00 INFO [service-mesh] Cross-AZ connections re-establishing: 9/12 restored
+2024-12-09 03:23:30 INFO [coredns] payment-svc.internal.prod.co resolving again — A record: 10.0.64.15
+2024-12-09 03:24:00 INFO [health-checker] payment-svc health check passing — service available
+2024-12-09 03:25:00 WARN [cert-manager] Certificate renewal still pending — *.internal.prod.co expires in 71 hours
+2024-12-09 03:25:01 ERROR [cert-manager] Renewal attempt 2/5 failed: DNS propagation timeout
+2024-12-09 03:30:00 WARN [network-controller] Post-incident: review BGP peering configuration for AZ resilience

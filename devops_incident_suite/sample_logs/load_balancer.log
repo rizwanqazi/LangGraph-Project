@@ -1,0 +1,24 @@
+2024-12-13 20:00:01 INFO [nginx-lb] Load balancer active: 6 backend servers, weighted round-robin
+2024-12-13 20:00:02 INFO [health-monitor] All backends healthy: 6/6 passing health checks
+2024-12-13 20:00:03 INFO [ssl-terminator] TLS termination active — 4200 active connections
+2024-12-13 20:10:00 WARN [health-monitor] Backend web-05 health check failed: HTTP 503 (attempt 1/3)
+2024-12-13 20:10:15 WARN [health-monitor] Backend web-05 health check failed: HTTP 503 (attempt 2/3)
+2024-12-13 20:10:30 ERROR [health-monitor] Backend web-05 marked unhealthy after 3 consecutive failures
+2024-12-13 20:10:31 INFO [nginx-lb] Removed web-05 from backend pool — 5 servers active
+2024-12-13 20:10:45 INFO [traffic-manager] Draining connections from web-05: 340 active connections
+2024-12-13 20:11:00 WARN [traffic-manager] Drain timeout: 120 connections still active on web-05 after 15s
+2024-12-13 20:11:30 WARN [health-monitor] Backend web-03 response time degraded: 2400ms (threshold: 1000ms)
+2024-12-13 20:12:00 ERROR [health-monitor] Backend web-03 marked slow — reducing traffic weight from 100 to 25
+2024-12-13 20:12:15 WARN [nginx-lb] Active backend capacity reduced: effective pool at 4.25/6 servers
+2024-12-13 20:12:30 WARN [ssl-terminator] SSL handshake rate increasing: 800/s (baseline: 300/s) — CPU at 78%
+2024-12-13 20:13:00 ERROR [nginx-lb] Sticky session mismatch: client 10.0.1.42 session bound to web-05 but server is down
+2024-12-13 20:13:01 WARN [nginx-lb] 45 sticky session clients orphaned by web-05 removal — reassigning
+2024-12-13 20:13:30 ERROR [ssl-terminator] TLS handshake failures spiking: 12% of new connections failing
+2024-12-13 20:13:45 CRITICAL [ssl-terminator] CPU at 95% — SSL termination becoming bottleneck
+2024-12-13 20:14:00 WARN [traffic-manager] Enabling SSL session caching to reduce handshake overhead
+2024-12-13 20:14:30 INFO [ssl-terminator] SSL session cache active — handshake rate dropping
+2024-12-13 20:15:00 INFO [health-monitor] Backend web-05 recovering: HTTP 200 (attempt 1/3 for recovery)
+2024-12-13 20:15:30 INFO [health-monitor] Backend web-05 marked healthy after 3 consecutive passes
+2024-12-13 20:15:31 INFO [nginx-lb] Added web-05 back to pool — 6 servers active
+2024-12-13 20:16:00 INFO [ssl-terminator] CPU at 52% — SSL termination normalized
+2024-12-13 20:16:01 WARN [health-monitor] Investigate web-03 slow responses — may need vertical scaling

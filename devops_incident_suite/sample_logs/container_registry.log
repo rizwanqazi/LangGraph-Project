@@ -1,0 +1,21 @@
+2024-12-12 10:00:01 INFO [registry-service] Container registry healthy: 2400 images, 18TB storage used
+2024-12-12 10:00:02 INFO [build-agent] CI build pipeline-main-1847 started — building app-backend:v3.2.0
+2024-12-12 10:05:00 INFO [build-agent] Image app-backend:v3.2.0 pushed to registry (size: 340MB, layers: 12)
+2024-12-12 10:05:30 INFO [deployment-controller] Rolling deployment started: app-backend staging v3.1.9 → v3.2.0
+2024-12-12 10:06:00 ERROR [deployment-controller] Image pull failed: app-backend:v3.2.0 — manifest unknown
+2024-12-12 10:06:01 ERROR [deployment-controller] Pod app-backend-7f8d9-xk2lm stuck in ImagePullBackOff
+2024-12-12 10:06:15 WARN [image-scanner] Vulnerability scan pending for app-backend:v3.2.0 — image not found in scan queue
+2024-12-12 10:06:30 ERROR [deployment-controller] Tag mismatch detected: staging expects v3.2.0 but registry shows latest as v3.1.9
+2024-12-12 10:07:00 WARN [registry-service] Image push replication lag: primary → replica at 45s (threshold: 10s)
+2024-12-12 10:07:15 INFO [deployment-controller] Image pull retry 2/5 for app-backend:v3.2.0
+2024-12-12 10:07:30 ERROR [deployment-controller] Image pull retry failed: digest verification mismatch — sha256:a1b2c3 != sha256:d4e5f6
+2024-12-12 10:07:45 CRITICAL [deployment-controller] Deployment app-backend stalled: 0/4 new pods ready after 120s
+2024-12-12 10:08:00 WARN [image-scanner] Critical vulnerability CVE-2024-9143 found in base image node:18-alpine used by app-backend
+2024-12-12 10:08:30 ERROR [garbage-collector] Registry GC blocked: blob in use by manifests pending replication
+2024-12-12 10:09:00 WARN [registry-service] Disk pressure warning: registry storage at 89% (18TB/20TB)
+2024-12-12 10:09:30 INFO [registry-service] Replication caught up — app-backend:v3.2.0 available on replica
+2024-12-12 10:10:00 INFO [deployment-controller] Image pull succeeded on retry 3/5 — digest verified
+2024-12-12 10:10:30 INFO [deployment-controller] Rolling deployment progressing: 2/4 new pods ready
+2024-12-12 10:11:00 INFO [deployment-controller] Deployment complete: app-backend v3.2.0 running on staging (4/4 pods)
+2024-12-12 10:11:30 WARN [image-scanner] Action required: CVE-2024-9143 in base image — rebuild with node:18.19-alpine
+2024-12-12 10:12:00 WARN [garbage-collector] Deferred GC: schedule cleanup during maintenance window to free 2.1TB

@@ -5,6 +5,7 @@ from __future__ import annotations
 import sys
 import os
 import json
+import threading
 import time
 
 import streamlit as st
@@ -14,6 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from graph import run_pipeline
 from models.schemas import Severity
+from utils.watcher import start_watcher, stop_watcher
 
 
 # --- Page Config ---
@@ -74,6 +76,45 @@ with st.sidebar:
         with open(os.path.join(sample_dir, selected_sample)) as f:
             st.session_state["sample_content"] = f.read()
             st.session_state["sample_name"] = selected_sample
+
+    st.divider()
+
+    # --- Live Folder Watcher ---
+    st.subheader("Live Folder Watcher")
+
+    _app_dir = os.path.dirname(os.path.abspath(__file__))
+    _watch_dir = os.path.join(_app_dir, "live_logs")
+    _processed_dir = os.path.join(_watch_dir, "processed")
+
+    watcher_on = st.toggle("Enable Watcher", value=False)
+
+    if watcher_on:
+        # Start watcher if not already running
+        if "watcher_stop_event" not in st.session_state:
+            stop_event = threading.Event()
+            thread = threading.Thread(
+                target=start_watcher,
+                args=(_watch_dir, _processed_dir, stop_event),
+                daemon=True,
+            )
+            thread.start()
+            st.session_state["watcher_stop_event"] = stop_event
+            st.session_state["watcher_thread"] = thread
+        st.markdown(":green[Watching live_logs/]")
+    else:
+        # Stop watcher if running
+        if "watcher_stop_event" in st.session_state:
+            stop_watcher(st.session_state["watcher_stop_event"])
+            st.session_state["watcher_thread"].join(timeout=10)
+            del st.session_state["watcher_stop_event"]
+            del st.session_state["watcher_thread"]
+        st.markdown(":gray[Stopped]")
+
+    # Show processed file count
+    processed_count = 0
+    if os.path.isdir(_processed_dir):
+        processed_count = len([f for f in os.listdir(_processed_dir) if f.endswith(".results.json")])
+    st.metric("Files processed", processed_count)
 
 
 # --- File Upload ---
@@ -151,7 +192,7 @@ if "result" in st.session_state:
     st.divider()
 
     # Tabbed output
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
         "Log Entries",
         "Issues & Remediation",
         "Root Cause Analysis",
@@ -159,6 +200,7 @@ if "result" in st.session_state:
         "Remediation Cookbook",
         "JIRA Tickets",
         "Slack Notification",
+        "Live Results",
     ])
 
     # Tab 1: Log Entries
@@ -307,6 +349,50 @@ if "result" in st.session_state:
                 st.json(notification.get("payload", {}))
         else:
             st.info("No notification generated.")
+
+    # Tab 8: Live Results
+    with tab8:
+        st.subheader("Live Results")
+
+        _app_dir_t = os.path.dirname(os.path.abspath(__file__))
+        _processed_dir_t = os.path.join(_app_dir_t, "live_logs", "processed")
+
+        if st.button("Refresh", key="refresh_live"):
+            pass  # Streamlit reruns on button click — re-scans below
+
+        if os.path.isdir(_processed_dir_t):
+            result_files = sorted(
+                [f for f in os.listdir(_processed_dir_t) if f.endswith(".results.json")],
+                key=lambda f: os.path.getmtime(os.path.join(_processed_dir_t, f)),
+                reverse=True,
+            )
+        else:
+            result_files = []
+
+        if result_files:
+            for rf in result_files:
+                rf_path = os.path.join(_processed_dir_t, rf)
+                with open(rf_path, "r", encoding="utf-8") as fh:
+                    lr = json.load(fh)
+
+                fname = lr.get("filename", rf)
+                processed_at = lr.get("processed_at", "unknown")
+                n_issues = len(lr.get("issues", []))
+                n_chains = len(lr.get("causal_chains", []))
+                n_risks = len(lr.get("risk_predictions", []))
+
+                with st.expander(f"{fname} — {processed_at}"):
+                    st.markdown(
+                        f"**Issues:** {n_issues} | "
+                        f"**Causal Chains:** {n_chains} | "
+                        f"**Risk Predictions:** {n_risks} | "
+                        f"**Processing Time:** {lr.get('processing_time_seconds', '?')}s"
+                    )
+                    if st.button("Load Full Results", key=f"load_{rf}"):
+                        st.session_state["result"] = lr
+                        st.rerun()
+        else:
+            st.info("No live-processed results yet. Enable the watcher and drop a log file into live_logs/.")
 
     # Error display
     if result.get("error"):

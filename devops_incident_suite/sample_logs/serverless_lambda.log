@@ -1,0 +1,24 @@
+2024-12-15 02:00:01 INFO [lambda-handler] Function order-processor initialized — runtime: python3.11, memory: 512MB
+2024-12-15 02:00:02 INFO [sqs-trigger] Polling queue order-events: 0 messages available
+2024-12-15 02:05:00 INFO [sqs-trigger] Batch received: 25 messages from order-events queue
+2024-12-15 02:05:01 WARN [lambda-handler] Cold start detected: initialization took 4200ms (threshold: 1000ms)
+2024-12-15 02:05:15 WARN [lambda-handler] Cold start on 3 concurrent invocations — latency impact on first requests
+2024-12-15 02:05:30 INFO [dynamodb-client] Batch write: 25 order records to OrdersTable
+2024-12-15 02:06:00 WARN [dynamodb-client] Write throttled: ProvisionedThroughputExceeded on OrdersTable (consumed: 450 WCU, provisioned: 400 WCU)
+2024-12-15 02:06:15 ERROR [dynamodb-client] Batch write partial failure: 8/25 items throttled — retrying with backoff
+2024-12-15 02:06:30 INFO [sqs-trigger] Batch received: 120 messages from order-events queue — traffic surge
+2024-12-15 02:06:45 WARN [lambda-handler] Concurrent executions at 85/100 — approaching account concurrency limit
+2024-12-15 02:07:00 ERROR [api-gateway] Downstream API payment-service timeout after 29000ms (Lambda timeout: 30s)
+2024-12-15 02:07:01 ERROR [lambda-handler] Function timed out processing message msg-88234 — execution duration 30000ms
+2024-12-15 02:07:15 WARN [sqs-trigger] 3 messages returned to queue — visibility timeout expired during processing
+2024-12-15 02:07:30 ERROR [lambda-handler] Invocation throttled: Rate exceeded — concurrency limit 100/100 reached
+2024-12-15 02:07:31 CRITICAL [lambda-handler] Throttled invocations: 35 messages could not be processed — backing up in SQS
+2024-12-15 02:08:00 WARN [cloudwatch-logs] Log ingestion delayed: 2500 log events buffered (CloudWatch throughput limit)
+2024-12-15 02:08:15 WARN [sqs-trigger] Queue depth growing: 340 messages (was 25 at start of surge)
+2024-12-15 02:08:30 ERROR [sqs-trigger] 5 messages exceeded max receive count (3) — moved to DLQ order-events-dlq
+2024-12-15 02:09:00 INFO [lambda-handler] Concurrency easing: 72/100 — processing catching up
+2024-12-15 02:09:30 INFO [dynamodb-client] Write throughput normalized — auto-scaling increased WCU to 600
+2024-12-15 02:10:00 INFO [sqs-trigger] Queue depth decreasing: 85 messages remaining
+2024-12-15 02:11:00 INFO [sqs-trigger] Queue drained: 0 messages — surge processed
+2024-12-15 02:11:01 WARN [sqs-trigger] 5 messages in DLQ require manual review
+2024-12-15 02:11:30 WARN [lambda-handler] Post-surge: consider reserved concurrency increase to 200 for order-processor
